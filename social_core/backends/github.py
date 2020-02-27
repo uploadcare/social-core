@@ -65,7 +65,8 @@ class GithubOAuth2(BaseOAuth2):
 
     def _user_data(self, access_token, path=None):
         url = urljoin(self.api_url(), 'user{0}'.format(path or ''))
-        return self.get_json(url, params={'access_token': access_token})
+        headers = {'Authorization': 'token {0}'.format(access_token)}
+        return self.get_json(url, headers=headers)
 
 
 class GithubMemberOAuth2(GithubOAuth2):
@@ -77,9 +78,8 @@ class GithubMemberOAuth2(GithubOAuth2):
             access_token, *args, **kwargs
         )
         try:
-            self.request(self.member_url(user_data), params={
-                'access_token': access_token
-            })
+            headers = {'Authorization': 'token {0}'.format(access_token)}
+            self.request(self.member_url(user_data), headers=headers)
         except HTTPError as err:
             # if the user is a member of the organization, response code
             # will be 204, see http://bit.ly/ZS6vFl
